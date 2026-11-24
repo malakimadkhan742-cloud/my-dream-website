@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design 2 — Modern TV Broadcast Scoreboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #ffffff;
+      width: 1280px;
+      height: 720px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hidden { display: none !important; }
+
+    /* LOCK SCREEN */
+    .lock-screen {
+      position: fixed;
+      inset: 0;
+      width: 1280px;
+      height: 720px;
+      background: radial-gradient(circle at center, #0c192c 0%, #050811 100%);
+      border: 4px solid #38bdf8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      z-index: 999;
+    }
+    .lock-badge {
+      background: #0284c7; color: #fff; font-size: 20px; font-weight: 700;
+      padding: 6px 24px; border-radius: 30px; border: 2px solid #38bdf8; margin-bottom: 16px;
+    }
+    .lock-title { font-size: 54px; font-weight: 700; color: #38bdf8; margin-bottom: 10px; }
+    .lock-match { font-size: 32px; margin-bottom: 16px; }
+    .lock-box {
+      background: rgba(56, 189, 248, 0.12); border: 2px solid #38bdf8;
+      border-radius: 12px; padding: 18px 36px; max-width: 780px;
+    }
+    .lock-price { font-size: 36px; font-weight: 700; color: #4ade80; margin-bottom: 6px; }
+    .lock-info { font-size: 20px; color: #e2e8f0; }
+
+    /* DESIGN 2: MODERN TV BROADCAST HUD */
+    .hud-wrapper {
+      width: 1280px;
+      height: 720px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 26px;
+    }
+
+    /* TOP STATUS & BALL EVENT BAR */
+    .top-hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .match-pill {
+      background: linear-gradient(90deg, #09152b 0%, #162d59 100%);
+      border: 2px solid #38bdf8;
+      border-radius: 40px;
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+    }
+
+    .live-dot {
+      width: 12px; height: 12px; border-radius: 50%; background: #ef4444;
+      box-shadow: 0 0 10px #ef4444;
+    }
+
+    .match-status-text {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #f8fafc;
+    }
+
+    .ball-event-pill {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #090d16;
+      border: 3px solid #fef08a;
+      border-radius: 16px;
+      padding: 6px 26px;
+      font-size: 46px;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+    }
+
+    /* BOTTOM TV LOWER-THIRD SCOREBUG */
+    .bottom-scorebug {
+      background: linear-gradient(180deg, rgba(11, 20, 38, 0.96) 0%, rgba(5, 10, 20, 0.98) 100%);
+      border: 2px solid #38bdf8;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.9);
+    }
+
+    .scorebug-main {
+      display: grid;
+      grid-template-columns: 360px 1fr 1fr 310px;
+      align-items: stretch;
+    }
+
+    /* TEAM SCORE MODULE */
+    .team-module {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-right: 2px solid #38bdf8;
+    }
+
+    .team-crest {
+      width: 68px; height: 68px; border-radius: 50%;
+      border: 3px solid #facc15; overflow: hidden; background: #0f172a; flex-shrink: 0;
+    }
+    .team-crest img { width: 100%; height: 100%; object-fit: cover; }
+
+    .team-score-info .t-name {
+      font-size: 22px; font-weight: 700; color: #fef08a; letter-spacing: 1px;
+    }
+    .team-score-info .t-score {
+      font-size: 46px; font-weight: 700; line-height: 0.95;
+    }
+    .team-score-info .t-overs {
+      font-size: 20px; font-weight: 700; color: #e0f2fe;
+    }
+
+    /* BATTER & BOWLER COLUMNS */
+    .player-col {
+      padding: 10px 16px;
+      border-right: 1px solid rgba(56, 189, 248, 0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .p-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .p-name { color: #ffffff; }
+    .p-runs { color: #facc15; font-size: 28px; }
+    .p-sub {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* BOWLER MODULE */
+    .bowler-col {
+      background: rgba(15, 23, 42, 0.9);
+      padding: 10px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .bw-label { font-size: 13px; color: #38bdf8; letter-spacing: 1.5px; font-weight: 700; }
+
+    /* LOWER TIMELINE & CRR STRIP */
+    .scorebug-footer {
+      background: #060b14;
+      border-top: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 6px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .f-stats span { margin-right: 18px; color: #cbd5e1; }
+    .f-stats strong { color: #facc15; }
+
+    .f-overs { display: flex; align-items: center; gap: 8px; }
+    .mini-ball {
+      width: 24px; height: 24px; border-radius: 4px;
+      background: #1e293b; border: 1px solid #64748b;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .b-4 { background: #2563eb; border-color: #93c5fd; }
+    .b-6 { background: #16a34a; border-color: #86efac; }
+    .b-w { background: #dc2626; border-color: #fca5a5; }
+  </style>
+</head>
+<body>
+  <!-- LOCK SCREEN -->
+  <div id="lock-screen" class="lock-screen hidden">
+    <div class="lock-badge">SUBSCRIPTION REQUIRED</div>
+    <div style="font-size:70px;">🔒</div>
+    <div class="lock-title">SCOREBOARD LOCKED (DESIGN 2)</div>
+    <div class="lock-match" id="lock-match-title">Live Cricket Match</div>
+    <div class="lock-box">
+      <div class="lock-price" id="lock-price">$5.00 Full Portal Access</div>
+      <div class="lock-info" id="lock-instructions">Pay $5 once to unlock all matches & both scoreboard designs.</div>
+    </div>
+  </div>
+
+  <!-- DESIGN 2 SCOREBOARD -->
+  <div class="hud-wrapper" id="hud-container">
+    <div class="top-hud">
+      <div class="match-pill">
+        <span class="live-dot"></span>
+        <span class="match-status-text" id="match-status">LIVE MATCH</span>
+      </div>
+      <div class="ball-event-pill" id="last-ball">0</div>
+    </div>
+
+    <div class="bottom-scorebug">
+      <div class="scorebug-main">
+        <!-- Team Score -->
+        <div class="team-module">
+          <div class="team-crest"><img id="batting-flag" src="https://flagcdn.com/w160/ae.png" alt="" /></div>
+          <div class="team-score-info">
+            <div class="t-name"><span id="batting-team">TEAM A</span> <small style="color:#e0f2fe;">vs <span id="bowling-team">TEAM B</span></small></div>
+            <div class="t-score"><span id="score">0/0</span> <span class="t-overs">(<span id="overs">0.0</span>)</span></div>
+          </div>
+        </div>
+
+        <!-- Batter 1 -->
+        <div class="player-col">
+          <div class="p-top">
+            <span class="p-name"><span id="striker-name">BATTER 1</span> <span id="striker-bat">🏏</span></span>
+            <span class="p-runs"><span id="striker-runs">0</span> <small id="striker-balls">(0)</small></span>
+          </div>
+          <div class="p-sub">
+            <span>4s: <strong id="striker-4s">0</strong> | 6s: <strong id="striker-6s">0</strong></span>
+            <span>SR: <strong id="striker-sr">0.00</strong></span>
+          </div>
+        </div>
+
+        <!-- Batter 2 -->
+        <div class="player-col">
+          <div class="p-top">
+            <span class="p-name"><span id="nonstriker-name">BATTER 2</span> <span id="nonstriker-bat" class="hidden">🏏</span></span>
+            <span class="p-runs"><span id="nonstriker-runs">0</span> <small id="nonstriker-balls">(0)</small></span>
+          </div>
+          <div class="p-sub">
+            <span>4s: <strong id="nonstriker-4s">0</strong> | 6s: <strong id="nonstriker-6s">0</strong></span>
+            <span>SR: <strong id="nonstriker-sr">0.00</strong></span>
+          </div>
+        </div>
+
+        <!-- Bowler -->
+        <div class="bowler-col">
+          <div class="bw-label">BOWLING</div>
+          <div class="p-top">
+            <span class="p-name" id="bowler-name">BOWLER</span>
+            <span class="p-runs"><span id="bowler-figures">0-0</span> <small id="bowler-overs">(0.0)</small></span>
+          </div>
+          <div class="p-sub">
+            <span>ECON: <strong id="bowler-econ">0.00</strong></span>
+            <span id="last-wicket">LIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="scorebug-footer">
+        <div class="f-stats">
+          <span>CRR: <strong id="crr">0.00</strong></span>
+          <span>P'SHIP: <strong id="partnership">0 (0)</strong></span>
+        </div>
+        <div class="f-overs">
+          <span style="color:#facc15;" id="over-curr-num">THIS OVER:</span>
+          <div id="over-curr-balls" style="display:flex; gap:5px;"></div>
+          <span style="color:#facc15;" id="over-curr-total">= 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const matchId = pathParts[pathParts.length - 1];
+    const accessKey = new URLSearchParams(window.location.search).get("key") || "";
+
+    function renderMiniBalls(balls) {
+      const box = document.getElementById("over-curr-balls");
+      box.innerHTML = "";
+      (balls || []).forEach(v => {
+        const el = document.createElement("div");
+        el.className = "mini-ball";
+        if (v === "4") el.classList.add("b-4");
+        else if (v === "6") el.classList.add("b-6");
+        else if (v.toUpperCase().includes("W")) el.classList.add("b-w");
+        el.textContent = v === "•" ? "·" : v;
+        box.appendChild(el);
+      });
+    }
+
+    async function fetchLiveScore() {
+      if (!matchId) return;
+      try {
+        const query = accessKey ? `?key=${encodeURIComponent(accessKey)}&t=${Date.now()}` : `?t=${Date.now()}`;
+        const res = await fetch(`/api/match/${matchId}${query}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const lockScreen = document.getElementById("lock-screen");
+        const hud = document.getElementById("hud-container");
+        if (data.locked) {
+          lockScreen.classList.remove("hidden");
+          hud.classList.add("hidden");
+          document.getElementById("lock-match-title").textContent = `${data.title} (${data.batting_team} vs ${data.bowling_team})`;
+          document.getElementById("lock-price").textContent = `${data.price || "$5"} Full Portal Access`;
+          document.getElementById("lock-instructions").textContent = data.payment_info || "";
+          return;
+        }
+
+        lockScreen.classList.add("hidden");
+        hud.classList.remove("hidden");
+
+        document.getElementById("batting-team").textContent = data.batting_team;
+        document.getElementById("bowling-team").textContent = data.bowling_team;
+        document.getElementById("batting-flag").src = data.batting_flag;
+        document.getElementById("score").textContent = data.score;
+        document.getElementById("overs").textContent = data.overs;
+        document.getElementById("last-ball").textContent = data.last_ball;
+        document.getElementById("crr").textContent = data.crr;
+        document.getElementById("partnership").textContent = data.partnership;
+        document.getElementById("match-status").textContent = data.match_status;
+
+        document.getElementById("over-curr-num").textContent = data.over_curr_num;
+        document.getElementById("over-curr-total").textContent = data.over_curr_total;
+        renderMiniBalls(data.over_curr_balls);
+
+        document.getElementById("striker-name").textContent = data.striker.name;
+        document.getElementById("striker-runs").textContent = data.striker.runs;
+        document.getElementById("striker-balls").textContent = data.striker.balls;
+        document.getElementById("striker-4s").textContent = data.striker.fours;
+        document.getElementById("striker-6s").textContent = data.striker.sixes;
+        document.getElementById("striker-sr").textContent = data.striker.sr;
+        document.getElementById("striker-bat").classList.toggle("hidden", !data.striker.on_strike);
+
+        document.getElementById("nonstriker-name").textContent = data.non_striker.name;
+        document.getElementById("nonstriker-runs").textContent = data.non_striker.runs;
+        document.getElementById("nonstriker-balls").textContent = data.non_striker.balls;
+        document.getElementById("nonstriker-4s").textContent = data.non_striker.fours;
+        document.getElementById("nonstriker-6s").textContent = data.non_striker.sixes;
+        document.getElementById("nonstriker-sr").textContent = data.non_striker.sr;
+        document.getElementById("nonstriker-bat").classList.toggle("hidden", !data.non_striker.on_strike);
+
+        document.getElementById("bowler-name").textContent = data.bowler.name;
+        document.getElementById("bowler-figures").textContent = data.bowler.figures;
+        document.getElementById("bowler-overs").textContent = data.bowler.overs;
+        document.getElementById("bowler-econ").textContent = data.bowler.econ;
+        document.getElementById("last-wicket").textContent = data.last_wicket;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchLiveScore();
+    setInterval(fetchLiveScore, 1000);
+  </script>
+</body>
+</html>
