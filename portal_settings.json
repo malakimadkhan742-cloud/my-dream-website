@@ -1,5 +1,7 @@
 {
-  "portal_locked": false,
+  "portal_locked": true,
   "price": "$5",
-  "payment_info": "Pay $5 once to unlock the FULL portal (all live matches & OBS scoreboards). Send payment receipt to get your Access Key."
+  "payment_info": "Pay $5 once to unlock the FULL portal (all live matches & both OBS scoreboards). Send payment receipt on WhatsApp to get your Access Key.",
+  "design1_name": "Design 1 — Classic Red & Gold Stadium",
+  "design2_name": "Design 2 — Modern TV Broadcast HUD"
 }
