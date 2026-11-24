@@ -140,7 +140,6 @@
       <a href="/" class="hamburger">☰</a>
       <div class="nav-links">
         <a href="/live-matches">Live Matches</a>
-        <a href="/admin">Admin Panel</a>
       </div>
     </div>
     <a href="/" class="brand-badge">CRICKET<span>OBS</span> LIVE</a>
@@ -251,8 +250,8 @@
         if (!matches.length) {
           container.innerHTML = `
             <div class="match-card" style="padding:32px; text-align:center;">
-              <h3>No Live Matches Added Yet</h3>
-              <p style="margin-top:8px; color:#64748b;">Go to <a href="/admin">/admin</a> to add your first live match.</p>
+              <h3>No Live Matches Available Right Now</h3>
+              <p style="margin-top:8px; color:#64748b;">Check back soon for live cricket broadcasts.</p>
             </div>`;
           return;
         }
