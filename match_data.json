@@ -1,0 +1,58 @@
+{
+  "url": "https://crex.com/cricket-live-score/ban-vs-sa-2nd-test-bangladesh-tour-of-south-africa-2026-match-updates-10MA",
+  "batting_team": "SOUTH AFRICA",
+  "bowling_team": "BANGLADESH",
+  "batting_flag": "https://flagcdn.com/w160/za.png",
+  "bowling_flag": "https://flagcdn.com/w160/bd.png",
+  "score": "49/0",
+  "overs": "9.0",
+  "last_ball": "0",
+  "crr": "4.34",
+  "partnership": "3(7)",
+  "match_status": "SA TRAIL BY 39 RUNS SA TRAIL BY 39 RUNS MATCH INFO LIVE SCORECARD DISCUSSIONS SERIES STATS NEWS Z HAMZA 2 (6) ZUBAYR HAMZA 2 (6) 4S: 0 6S: 0 SR: 33",
+  "over_prev_num": "OVER 10:",
+  "over_prev_balls": [
+    "W",
+    "0",
+    "0",
+    "0",
+    "2",
+    "0"
+  ],
+  "over_prev_total": "= 2",
+  "over_curr_num": "OVER 11:",
+  "over_curr_balls": [
+    "1",
+    "0",
+    "\u2022",
+    "\u2022",
+    "\u2022",
+    "\u2022"
+  ],
+  "over_curr_total": "= 1",
+  "striker": {
+    "name": "M. ACKERMAN",
+    "runs": "4",
+    "balls": "(11)",
+    "fours": "0",
+    "sixes": "0",
+    "sr": "36.36",
+    "on_strike": true
+  },
+  "non_striker": {
+    "name": "A. MARKRAM",
+    "runs": "17",
+    "balls": "(18)",
+    "fours": "4",
+    "sixes": "0",
+    "sr": "94.44",
+    "on_strike": false
+  },
+  "bowler": {
+    "name": "T. AHMED",
+    "figures": "0-8",
+    "overs": "(2.5)",
+    "econ": "2.82"
+  },
+  "last_wicket": "BAN 1ST INN: 91/10 (33.3 OV)"
+}
