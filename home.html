@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Cricket Matches & OBS Scoreboards</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+    body { background: #eef2f3; color: #1e293b; }
+
+    .navbar {
+      background: #0d7377; height: 62px; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); position: sticky; top: 0; z-index: 50;
+    }
+    .nav-left { display: flex; align-items: center; gap: 18px; }
+    .hamburger { color: #fff; font-size: 24px; cursor: pointer; text-decoration: none; }
+    .nav-links a {
+      color: #e0f2f1; text-decoration: none; font-weight: 600; font-size: 15px; margin-right: 18px;
+    }
+    .brand-badge {
+      background: #064e52; color: #fff; border: 2px solid #4fd1c5;
+      padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 16px;
+      letter-spacing: 0.5px; text-decoration: none;
+    }
+    .brand-badge span { color: #facc15; }
+
+    .container { max-width: 1120px; margin: 24px auto; padding: 0 18px; }
+
+    .sub-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f8fafc; border: 2px solid #facc15; border-radius: 10px;
+      padding: 20px 24px; margin-bottom: 18px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .sub-banner.unlocked-banner {
+      border-color: #22c55e;
+      background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+    }
+    .sub-info h2 { font-size: 20px; color: #facc15; margin-bottom: 4px; }
+    .unlocked-banner .sub-info h2 { color: #4ade80; }
+    .sub-info p { font-size: 14px; color: #cbd5e1; max-width: 620px; line-height: 1.45; }
+    .key-form { display: flex; gap: 8px; flex-wrap: wrap; }
+    .key-input {
+      padding: 10px 14px; border-radius: 6px; border: 1px solid #475569;
+      background: #0f172a; color: #fff; font-size: 14px; width: 220px;
+    }
+    .btn-unlock-portal {
+      background: #facc15; color: #0f172a; border: none; padding: 10px 18px;
+      border-radius: 6px; font-weight: 800; cursor: pointer; font-size: 14px;
+    }
+    .btn-logout {
+      background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3);
+      padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;
+    }
+
+    /* DESIGN SELECTOR BAR */
+    .design-bar {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .design-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+    .design-btn {
+      padding: 9px 16px;
+      border-radius: 6px;
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .design-btn.active {
+      background: #0d7377;
+      color: #ffffff;
+      border-color: #0d7377;
+    }
+
+    .match-card {
+      background: #ffffff; border-radius: 6px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      margin-bottom: 24px; overflow: hidden; border: 1px solid #dce4e7;
+    }
+    .card-header {
+      background: #147a7e; color: #ffffff; padding: 12px 22px;
+      display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px;
+    }
+    .card-body {
+      padding: 26px 32px; display: grid; grid-template-columns: 1fr 80px 1fr;
+      align-items: center; border-bottom: 1px solid #e2e8f0;
+    }
+    @media (max-width: 720px) {
+      .card-body { grid-template-columns: 1fr; gap: 18px; text-align: center; }
+    }
+    .team-side { display: flex; align-items: center; gap: 18px; }
+    .team-logo {
+      width: 68px; height: 68px; border-radius: 50%; border: 2px solid #147a7e; padding: 3px;
+      background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
+    }
+    .team-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .team-info h3 { font-size: 17px; color: #0f3d3e; margin-bottom: 4px; font-weight: 700; }
+    .team-info p { font-size: 15px; color: #334155; font-weight: 500; }
+    .vs-label { text-align: center; font-weight: 800; font-size: 18px; color: #1e293b; }
+
+    .card-footer {
+      padding: 14px 24px; display: flex; flex-wrap: wrap;
+      justify-content: space-between; align-items: center; gap: 12px; background: #fafcfc;
+    }
+    .meta-info { font-size: 14px; color: #334155; line-height: 1.6; }
+    .status-live { color: #dc2626; font-weight: 700; text-transform: lowercase; }
+    .obs-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .obs-input {
+      background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 5px;
+      padding: 7px 10px; font-family: monospace; font-size: 13px; color: #0f172a; width: 325px;
+    }
+    .btn-copy {
+      background: #0d7377; color: #fff; border: none; padding: 8px 16px;
+      border-radius: 5px; font-weight: 700; font-size: 13px; cursor: pointer;
+    }
+    .btn-preview {
+      background: #e2e8f0; color: #0f172a; text-decoration: none;
+      padding: 8px 14px; border-radius: 5px; font-weight: 700; font-size: 13px;
+    }
+    .locked-pill {
+      background: #fee2e2; color: #b91c1c; padding: 8px 14px;
+      border-radius: 5px; font-weight: 700; font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="/" class="hamburger">☰</a>
+      <div class="nav-links">
+        <a href="/live-matches">Live Matches</a>
+        <a href="/admin">Admin Panel</a>
+      </div>
+    </div>
+    <a href="/" class="brand-badge">CRICKET<span>OBS</span> LIVE</a>
+  </nav>
+
+  <main class="container">
+    <div id="portal-banner" class="sub-banner">
+      <div class="sub-info">
+        <h2 id="banner-title">🔒 Full Portal Locked — $5 Subscription</h2>
+        <p id="banner-desc">Loading subscription details...</p>
+      </div>
+      <div class="key-form" id="key-controls">
+        <input type="text" id="access-key-input" class="key-input" placeholder="Enter your $5 Access Key" />
+        <button class="btn-unlock-portal" onclick="applyKey()">Unlock Full Portal</button>
+      </div>
+    </div>
+
+    <!-- SCOREBOARD DESIGN SWITCHER -->
+    <div class="design-bar">
+      <div>
+        <strong>Select OBS Scoreboard Design:</strong>
+        <span style="font-size:13px; color:#64748b; margin-left:6px;">Choose your preferred broadcast layout</span>
+      </div>
+      <div class="design-buttons">
+        <button id="btn-d1" class="design-btn active" onclick="selectDesign('obs')">Design 1 — Classic Red & Gold</button>
+        <button id="btn-d2" class="design-btn" onclick="selectDesign('obs2')">Design 2 — Modern TV Broadcast</button>
+      </div>
+    </div>
+
+    <div id="matches-container">
+      <p style="text-align:center; color:#64748b; padding:40px;">Loading live matches...</p>
+    </div>
+  </main>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("key")) {
+      localStorage.setItem("portal_access_key", urlParams.get("key").trim());
+    }
+    let selectedRoute = localStorage.getItem("selected_obs_design") || "obs";
+
+    function selectDesign(routePrefix) {
+      selectedRoute = routePrefix;
+      localStorage.setItem("selected_obs_design", routePrefix);
+      document.getElementById("btn-d1").classList.toggle("active", routePrefix === "obs");
+      document.getElementById("btn-d2").classList.toggle("active", routePrefix === "obs2");
+      loadLiveMatches(false);
+    }
+
+    function getSavedKey() {
+      return localStorage.getItem("portal_access_key") || "";
+    }
+
+    function applyKey() {
+      const val = document.getElementById("access-key-input").value.trim();
+      if (!val) return;
+      localStorage.setItem("portal_access_key", val);
+      loadLiveMatches(true);
+    }
+
+    function clearKey() {
+      localStorage.removeItem("portal_access_key");
+      loadLiveMatches(false);
+    }
+
+    async function loadLiveMatches(showAlert = false) {
+      try {
+        const key = getSavedKey();
+        const query = key ? `?key=${encodeURIComponent(key)}` : "";
+        const res = await fetch(`/api/matches${query}`);
+        const payload = await res.json();
+        const matches = payload.matches || [];
+        const unlocked = payload.unlocked;
+
+        document.getElementById("btn-d1").textContent = payload.design1_name || "Design 1";
+        document.getElementById("btn-d2").textContent = payload.design2_name || "Design 2";
+        document.getElementById("btn-d1").classList.toggle("active", selectedRoute === "obs");
+        document.getElementById("btn-d2").classList.toggle("active", selectedRoute === "obs2");
+
+        const banner = document.getElementById("portal-banner");
+        const titleEl = document.getElementById("banner-title");
+        const descEl = document.getElementById("banner-desc");
+        const controlsEl = document.getElementById("key-controls");
+
+        if (unlocked) {
+          banner.classList.add("unlocked-banner");
+          titleEl.textContent = "🔓 Full Portal Unlocked — All Live Matches & Both Designs Active";
+          descEl.textContent = key
+            ? `Active Subscription Key: ${key} — Switch between Design 1 & Design 2 above and copy your OBS URL.`
+            : "Portal is currently open for all users.";
+          controlsEl.innerHTML = key
+            ? `<button class="btn-logout" onclick="clearKey()">Lock / Sign Out Key</button>`
+            : "";
+        } else {
+          if (showAlert && key) {
+            alert("Invalid or locked Access Key. Please contact admin after paying $5.");
+          }
+          banner.classList.remove("unlocked-banner");
+          titleEl.textContent = `🔒 Full Portal Locked — ${payload.price || "$5"} Subscription`;
+          descEl.textContent = payload.payment_info || "";
+          controlsEl.innerHTML = `
+            <input type="text" id="access-key-input" class="key-input" value="${key}" placeholder="Enter your $5 Access Key" />
+            <button class="btn-unlock-portal" onclick="applyKey()">Unlock Full Portal</button>
+          `;
+        }
+
+        const container = document.getElementById("matches-container");
+        if (!matches.length) {
+          container.innerHTML = `
+            <div class="match-card" style="padding:32px; text-align:center;">
+              <h3>No Live Matches Added Yet</h3>
+              <p style="margin-top:8px; color:#64748b;">Go to <a href="/admin">/admin</a> to add your first live match.</p>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = matches.map(m => {
+          const obsUrl = key
+            ? `${window.location.origin}/${selectedRoute}/${m.id}?key=${encodeURIComponent(key)}`
+            : `${window.location.origin}/${selectedRoute}/${m.id}`;
+
+          const actionHtml = unlocked
+            ? `
+              <input class="obs-input" type="text" value="${obsUrl}" readonly />
+              <button class="btn-copy" onclick="copyObsUrl('${obsUrl}', this)">Copy OBS URL</button>
+              <a class="btn-preview" href="${obsUrl}" target="_blank">Preview</a>
+            `
+            : `
+              <span class="locked-pill">🔒 Locked (${payload.price || "$5"} Full Portal)</span>
+              <a class="btn-preview" href="${obsUrl}" target="_blank">Preview Lock Screen</a>
+            `;
+
+          return `
+            <div class="match-card">
+              <div class="card-header">
+                <span>${m.title}</span>
+                <span>${m.match_time || "LIVE"}</span>
+              </div>
+              <div class="card-body">
+                <div class="team-side">
+                  <div class="team-logo"><img src="${m.batting_flag}" alt="${m.batting_team}" /></div>
+                  <div class="team-info">
+                    <h3>${m.batting_team}</h3>
+                    <p>${m.score} (${m.overs} overs)</p>
+                  </div>
+                </div>
+                <div class="vs-label">VS</div>
+                <div class="team-side">
+                  <div class="team-logo"><img src="${m.bowling_flag}" alt="${m.bowling_team}" /></div>
+                  <div class="team-info">
+                    <h3>${m.bowling_team}</h3>
+                    <p>${m.bowling_score || "Bowling"}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="meta-info">
+                  <div><strong>Status:</strong> <span class="status-live">live</span> — ${m.status}</div>
+                  <div><strong>Active Layout:</strong> ${selectedRoute === "obs" ? (payload.design1_name || "Design 1") : (payload.design2_name || "Design 2")}</div>
+                </div>
+                <div class="obs-actions">${actionHtml}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function copyObsUrl(url, btn) {
+      navigator.clipboard.writeText(url);
+      const prev = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = prev, 1500);
+    }
+
+    loadLiveMatches();
+    setInterval(() => loadLiveMatches(false), 5000);
+  </script>
+</body>
+</html>
