@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — $5 Full Portal Subscriptions & Live Matches</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: #0f172a; color: #f8fafc; margin: 0; padding: 28px 16px; }
+    .container { max-width: 1020px; margin: 0 auto; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    h1 { margin: 0; font-size: 24px; color: #2dd4bf; }
+    h2 { margin: 0 0 14px 0; font-size: 18px; color: #facc15; }
+    a.back { color: #38bdf8; text-decoration: none; font-weight: 600; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 20px; margin-bottom: 22px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    @media (max-width: 680px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 13px; font-weight: 600; color: #cbd5e1; margin-bottom: 5px; }
+    input {
+      width: 100%; padding: 10px 12px; border-radius: 7px;
+      border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 14px;
+    }
+    .full { grid-column: 1 / -1; }
+    button {
+      background: #0d7377; color: #fff; border: none; padding: 10px 16px;
+      border-radius: 7px; font-weight: 700; cursor: pointer; font-size: 13px;
+    }
+    button:hover { opacity: 0.92; }
+    .btn-unlock { background: #16a34a; }
+    .btn-lock { background: #dc2626; }
+    .btn-copy { background: #2563eb; }
+    .btn-edit { background: #475569; }
+    .btn-del { background: #7f1d1d; }
+    .row {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 12px; padding: 12px 0; border-bottom: 1px solid #334155;
+    }
+    .row:last-child { border-bottom: none; }
+    .badge-locked { background: #dc2626; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+    .badge-unlocked { background: #16a34a; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+    .mono { font-family: monospace; font-size: 12px; color: #38bdf8; margin-top: 4px; }
+    .msg { margin-top: 10px; font-size: 14px; color: #4ade80; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <h1>Admin — $5 Full Portal Lock/Unlock & Live Matches</h1>
+      <a class="back" href="/live-matches">← View Public Live Matches Page</a>
+    </div>
+
+    <!-- ADMIN LOGIN & GLOBAL PORTAL CONTROL -->
+    <div class="card">
+      <h2>1. Portal Subscription Settings ($5 Full Portal Access)</h2>
+      <div class="grid">
+        <div>
+          <label>Admin Password</label>
+          <input type="password" id="password" placeholder="Enter password (default: admin123)" onchange="loadOverview()" />
+        </div>
+        <div>
+          <label>Subscription Price Label</label>
+          <input type="text" id="portal_price" value="$5" />
+        </div>
+        <div class="full">
+          <label>Payment Instructions Shown to Locked Visitors</label>
+          <input type="text" id="portal_payment_info" placeholder="Pay $5 via Easypaisa/JazzCash/PayPal & WhatsApp +92... to get your Full Portal Key." />
+        </div>
+      </div>
+      <div style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <button onclick="loadOverview()">Unlock Admin Dashboard</button>
+        <button class="btn-edit" onclick="savePortalSettings()">Save Price & Payment Info</button>
+        <button id="global-lock-btn" class="btn-lock" onclick="toggleGlobalLock()">Portal Mode: 🔒 Locked ($5 Required)</button>
+      </div>
+    </div>
+
+    <!-- SUBSCRIBER USERS MANAGEMENT -->
+    <div class="card">
+      <h2>2. Paid Users ($5 Full Portal Keys — Lock / Unlock Any User)</h2>
+      <div class="grid-3">
+        <div>
+          <label>User Name / WhatsApp</label>
+          <input type="text" id="sub_name" placeholder="e.g. Ali Khan (+92300...)" />
+        </div>
+        <div>
+          <label>Custom Key (Optional — leave blank to auto-generate)</label>
+          <input type="text" id="sub_key" placeholder="e.g. ali-5usd" />
+        </div>
+        <div>
+          <label>Payment Note</label>
+          <input type="text" id="sub_note" value="$5 Paid" />
+        </div>
+      </div>
+      <div style="margin-top: 12px;">
+        <button class="btn-unlock" onclick="addSubscriber()">+ Add & Unlock $5 User</button>
+      </div>
+      <div id="users-list" style="margin-top: 16px;">Enter Admin Password above to view & manage users...</div>
+    </div>
+
+    <!-- ADD / EDIT MATCHES -->
+    <div class="card">
+      <h2>3. Add or Update Live Cricket Matches</h2>
+      <div class="grid">
+        <div>
+          <label>Match URL Slug (e.g. uae-vs-oman)</label>
+          <input type="text" id="slug" placeholder="uae-vs-oman" />
+        </div>
+        <div>
+          <label>Match Header Title</label>
+          <input type="text" id="title" placeholder="UAE vs OMAN" />
+        </div>
+        <div>
+          <label>Match Time</label>
+          <input type="text" id="match_time" placeholder="8:00 PM" />
+        </div>
+        <div>
+          <label>Venue</label>
+          <input type="text" id="venue" placeholder="Dubai International Stadium" />
+        </div>
+        <div class="full">
+          <label>CREX or ESPNcricinfo Live Score URL</label>
+          <input type="url" id="crex_url" placeholder="https://crex.com/cricket-live-score/..." />
+        </div>
+      </div>
+      <div style="margin-top: 14px;">
+        <button onclick="saveMatch()">Publish / Update Match</button>
+      </div>
+      <div id="status-msg" class="msg"></div>
+      <div id="matches-list" style="margin-top: 16px;"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentPortalLocked = true;
+
+    async function loadOverview() {
+      const password = document.getElementById("password").value;
+      if (!password) return;
+
+      const res = await fetch("/api/admin/overview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+      if (!res.ok) {
+        alert("Invalid Admin Password");
+        return;
+      }
+
+      const data = await res.json();
+      currentPortalLocked = data.settings.portal_locked;
+      document.getElementById("portal_price").value = data.settings.price || "$5";
+      document.getElementById("portal_payment_info").value = data.settings.payment_info || "";
+
+      const gBtn = document.getElementById("global-lock-btn");
+      if (currentPortalLocked) {
+        gBtn.className = "btn-lock";
+        gBtn.textContent = "Portal Mode: 🔒 Locked ($5 Key Required)";
+      } else {
+        gBtn.className = "btn-unlock";
+        gBtn.textContent = "Portal Mode: 🔓 Free / Open to Everyone";
+      }
+
+      // Render Users
+      const usersEl = document.getElementById("users-list");
+      usersEl.innerHTML = data.users.map(u => {
+        const portalLink = `${window.location.origin}/live-matches?key=${encodeURIComponent(u.key)}`;
+        return `
+          <div class="row">
+            <div>
+              <strong>${u.name}</strong> (${u.note}) —
+              <span class="${u.active ? 'badge-unlocked' : 'badge-locked'}">
+                ${u.active ? '🔓 UNLOCKED (FULL PORTAL)' : '🔒 LOCKED'}
+              </span>
+              <div class="mono">Key: ${u.key} | Direct Unlock Link: ${portalLink}</div>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="${u.active ? 'btn-lock' : 'btn-unlock'}" onclick="toggleUser('${u.key}')">
+                ${u.active ? '🔒 Lock User' : '🔓 Unlock User'}
+              </button>
+              <button class="btn-copy" onclick="copyText('${portalLink}', this)">Copy Portal Link</button>
+              <button class="btn-del" onclick="deleteUser('${u.key}')">Remove</button>
+            </div>
+          </div>
+        `;
+      }).join("") || "<p style='color:#94a3b8'>No $5 subscribers added yet.</p>";
+
+      // Render Matches
+      const matchesEl = document.getElementById("matches-list");
+      matchesEl.innerHTML = data.matches.map(m => `
+        <div class="row">
+          <div>
+            <strong>${m.title}</strong> (${m.score} • ${m.overs} ov)
+            <div class="mono">/obs/${m.id}</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-edit" onclick='fillForm(${JSON.stringify(m)})'>Edit</button>
+            <button class="btn-del" onclick="deleteMatch('${m.id}')">Delete</button>
+          </div>
+        </div>
+      `).join("") || "<p style='color:#94a3b8'>No matches added yet.</p>";
+    }
+
+    function copyText(txt, btn) {
+      navigator.clipboard.writeText(txt);
+      const old = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = old, 1400);
+    }
+
+    async function savePortalSettings() {
+      const password = document.getElementById("password").value;
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password,
+          price: document.getElementById("portal_price").value,
+          payment_info: document.getElementById("portal_payment_info").value
+        })
+      });
+      if (res.ok) {
+        alert("Portal price & payment instructions saved!");
+        loadOverview();
+      }
+    }
+
+    async function toggleGlobalLock() {
+      const password = document.getElementById("password").value;
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password, portal_locked: !currentPortalLocked })
+      });
+      if (res.ok) loadOverview();
+    }
+
+    async function addSubscriber() {
+      const password = document.getElementById("password").value;
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password,
+          name: document.getElementById("sub_name").value,
+          key: document.getElementById("sub_key").value,
+          note: document.getElementById("sub_note").value
+        })
+      });
+      if (res.ok) {
+        document.getElementById("sub_name").value = "";
+        document.getElementById("sub_key").value = "";
+        loadOverview();
+      } else {
+        alert("Enter valid Admin Password first.");
+      }
+    }
+
+    async function toggleUser(key) {
+      const password = document.getElementById("password").value;
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(key)}/toggle`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+      if (res.ok) loadOverview();
+    }
+
+    async function deleteUser(key) {
+      const password = document.getElementById("password").value;
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(key)}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+      if (res.ok) loadOverview();
+    }
+
+    function fillForm(m) {
+      document.getElementById("slug").value = m.id || "";
+      document.getElementById("title").value = m.title || "";
+      document.getElementById("match_time").value = m.match_time || "";
+      document.getElementById("venue").value = m.venue || "";
+      document.getElementById("crex_url").value = m.crex_url || "";
+    }
+
+    async function saveMatch() {
+      const password = document.getElementById("password").value;
+      const res = await fetch("/api/matches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password,
+          slug: document.getElementById("slug").value,
+          title: document.getElementById("title").value,
+          match_time: document.getElementById("match_time").value,
+          venue: document.getElementById("venue").value,
+          crex_url: document.getElementById("crex_url").value
+        })
+      });
+      const data = await res.json();
+      const msg = document.getElementById("status-msg");
+      if (!res.ok) {
+        msg.style.color = "#f87171";
+        msg.textContent = data.error || "Error saving match";
+        return;
+      }
+      msg.style.color = "#4ade80";
+      msg.textContent = `Published match "${data.id}"!`;
+      loadOverview();
+    }
+
+    async function deleteMatch(id) {
+      const password = document.getElementById("password").value;
+      const res = await fetch(`/api/matches/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+      if (res.ok) loadOverview();
+    }
+  </script>
+</body>
+</html>
